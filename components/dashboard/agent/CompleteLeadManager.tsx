@@ -43,6 +43,18 @@ import {
 import { leadsData, type Lead, type LeadStatus } from '@/lib/data';
 import { cn } from '@/lib/utils';
 
+interface CalendarEvent {
+  id: string;
+  title: string;
+  date: Date;
+  type: string;
+  leadId: string;
+  lead: Lead;
+  priority?: string;     // Add this
+  isOverdue?: boolean;   // Add this
+  task?: any;           // Add this if needed
+}
+
 type ViewMode = 'timeline' | 'list' | 'calendar' | 'analytics';
 type FilterType = 'all' | 'hot' | 'overdue' | 'high-value' | 'this-week';
 type SortKey = 'clientName' | 'estimatedValue' | 'updatedAt' | 'status' | 'aiScore';
@@ -50,7 +62,7 @@ type SortDirection = 'asc' | 'desc';
 
 // Calendar event generator from leads data
 const generateCalendarEvents = (leads: Lead[]) => {
-  const events = [];
+  const events: CalendarEvent[] = [];
   const now = new Date();
 
   leads.forEach(lead => {
