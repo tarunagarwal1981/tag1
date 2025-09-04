@@ -163,6 +163,79 @@ export interface SubAgent {
   avatarUrl: string;
 }
 
+// Operator-specific interfaces
+export interface OperatorActivity {
+  id: string;
+  type: 'AGENT_MESSAGE' | 'QUOTE_SENT' | 'CALL_SCHEDULED' | 'PACKAGE_CREATED' | 'BOOKING_CONFIRMED' | 'PAYMENT_RECEIVED';
+  content: string;
+  timestamp: string;
+  author: string;
+  agentInvolved?: string;
+}
+
+export interface OperatorTask {
+  id: string;
+  description: string;
+  dueDate: string;
+  priority: 'Low' | 'Medium' | 'High';
+  isCompleted: boolean;
+  assignedTo: string;
+  type: 'QUOTE_PREPARATION' | 'AGENT_FOLLOWUP' | 'PACKAGE_CUSTOMIZATION' | 'BOOKING_CONFIRMATION';
+}
+
+export interface OperatorLead {
+  id: string;
+  agentName: string;
+  agentCompany: string;
+  agentCountry: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  destination: string;
+  travelDates: { from: string; to: string };
+  travelerCount: number;
+  estimatedValue: number;
+  status: 'NEW_INQUIRY' | 'REVIEWING' | 'QUOTED' | 'NEGOTIATING' | 'CONFIRMED' | 'IN_PROGRESS';
+  temperature: 'HOT' | 'WARM' | 'COLD' | 'HOLD';
+  aiScore: number;
+  agentRating: number;
+  createdAt: string;
+  updatedAt: string;
+  activity: OperatorActivity[];
+  tasks: OperatorTask[];
+  commissionRate: number;
+  packageType: string;
+  responseTime?: string;
+}
+
+export interface TourPackage {
+  id: string;
+  name: string;
+  destinations: string[];
+  duration: number;
+  price: number;
+  bookings: number;
+  revenue: number;
+  rating: number;
+  status: 'active' | 'inactive';
+  category: string;
+}
+
+export interface PartnerAgent {
+  id: string;
+  name: string;
+  company: string;
+  country: string;
+  bookings: number;
+  revenue: number;
+  rating: number;
+  partnership: string;
+  commissionRate: number;
+  totalClients: number;
+  responseRate: number;
+}
+
+
 // --- DATA ---
 
 export const sidebarNavItems: Record<'agent' | 'operator', NavItem[]> = {
@@ -1331,4 +1404,402 @@ export const aiInsightsData = {
       action: 'Suggest Rajasthan palace add-on',
     },
   ],
+};
+
+// Export the operator data
+export const operatorData = {
+  profile: {
+    name: "Incredible India Tours",
+    logo: "🇮🇳",
+    location: "New Delhi, India",
+    rating: 4.8,
+    totalBookings: 2847,
+    yearsInBusiness: 12
+  },
+  metrics: {
+    totalRevenue: 2850000,
+    monthlyRevenue: 285000,
+    activeLeads: 47,
+    hotLeads: 12,
+    conversionRate: 68,
+    avgBookingValue: 3200,
+    agentsWorking: 156,
+    packagesLive: 89
+  },
+};
+// Add these to your existing lib/data.ts file
+export const operatorLeadsData: OperatorLead[] = [
+  {
+    id: 'OL-001',
+    agentName: 'Sarah Mitchell',
+    agentCompany: 'UK Adventure Travel Ltd',
+    agentCountry: 'United Kingdom',
+    clientName: 'Johnson Family',
+    clientEmail: 'johnson@family.com',
+    clientPhone: '+44 7700 900501',
+    destination: 'Golden Triangle + Goa',
+    travelDates: { from: '2025-11-15', to: '2025-11-25' },
+    travelerCount: 4,
+    estimatedValue: 8500,
+    status: 'NEW_INQUIRY',
+    temperature: 'HOT',
+    aiScore: 92,
+    agentRating: 4.9,
+    createdAt: '2025-09-03T10:30:00Z',
+    updatedAt: '2025-09-03T10:30:00Z',
+    activity: [
+      {
+        id: 'OA-001',
+        type: 'AGENT_MESSAGE',
+        content: 'Initial inquiry received via agent portal. Client is interested in a classic Golden Triangle tour with a beach extension.',
+        timestamp: '2025-09-03T10:30:00Z',
+        author: 'System',
+        agentInvolved: 'Sarah Mitchell',
+      },
+    ],
+    tasks: [
+      {
+        id: 'OT-001',
+        description: 'Prepare Golden Triangle Classic + Goa package quote',
+        dueDate: '2025-09-05T12:00:00Z',
+        priority: 'High',
+        isCompleted: false,
+        assignedTo: 'In-house Operator',
+        type: 'QUOTE_PREPARATION',
+      },
+    ],
+    commissionRate: 15,
+    packageType: 'Golden Triangle Classic',
+    responseTime: 'Pending',
+  },
+  {
+    id: 'OL-002',
+    agentName: 'James Wilson',
+    agentCompany: 'European Escapes',
+    agentCountry: 'Germany',
+    clientName: 'Mueller Family',
+    clientEmail: 'mueller.f@gmail.com',
+    clientPhone: '+49 1573 543210',
+    destination: 'Kerala Backwaters',
+    travelDates: { from: '2025-12-08', to: '2025-12-16' },
+    travelerCount: 2,
+    estimatedValue: 4200,
+    status: 'QUOTED',
+    temperature: 'WARM',
+    aiScore: 78,
+    agentRating: 4.6,
+    createdAt: '2025-09-01T14:20:00Z',
+    updatedAt: '2025-09-03T14:20:00Z',
+    activity: [
+      {
+        id: 'OA-002',
+        type: 'AGENT_MESSAGE',
+        content: 'Agent sent inquiry for Kerala Backwaters package for a couple.',
+        timestamp: '2025-09-01T14:20:00Z',
+        author: 'System',
+        agentInvolved: 'James Wilson',
+      },
+      {
+        id: 'OA-003',
+        type: 'PACKAGE_CREATED',
+        content: 'Created and sent Kerala Experience package quote to agent James Wilson.',
+        timestamp: '2025-09-02T10:00:00Z',
+        author: 'In-house Operator',
+        agentInvolved: 'James Wilson',
+      },
+      {
+        id: 'OA-004',
+        type: 'AGENT_MESSAGE',
+        content: 'Agent responded: "Client liked the itinerary but is asking about adding an Ayurveda retreat option."',
+        timestamp: '2025-09-03T14:20:00Z',
+        author: 'James Wilson',
+      },
+    ],
+    tasks: [
+      {
+        id: 'OT-002',
+        description: 'Send revised quote with Ayurveda retreat add-on',
+        dueDate: '2025-09-05T10:00:00Z',
+        priority: 'Medium',
+        isCompleted: false,
+        assignedTo: 'In-house Operator',
+        type: 'PACKAGE_CUSTOMIZATION',
+      },
+    ],
+    commissionRate: 12,
+    packageType: 'Kerala Experience',
+    responseTime: '2.3 hours',
+  },
+  {
+    id: 'OL-003',
+    agentName: 'Maria Rodriguez',
+    agentCompany: 'Spain Travel Solutions',
+    agentCountry: 'Spain',
+    clientName: 'Garcia Group',
+    clientEmail: 'garcia.g@travel.es',
+    clientPhone: '+34 600 123456',
+    destination: 'Rajasthan Heritage',
+    travelDates: { from: '2025-10-22', to: '2025-11-01' },
+    travelerCount: 6,
+    estimatedValue: 12000,
+    status: 'NEGOTIATING',
+    temperature: 'HOT',
+    aiScore: 85,
+    agentRating: 4.8,
+    createdAt: '2025-08-30T16:45:00Z',
+    updatedAt: '2025-09-04T10:00:00Z',
+    activity: [
+      {
+        id: 'OA-005',
+        type: 'AGENT_MESSAGE',
+        content: 'Inquiry received for Rajasthan Heritage package for 6 travelers.',
+        timestamp: '2025-08-30T16:45:00Z',
+        author: 'System',
+        agentInvolved: 'Maria Rodriguez',
+      },
+      {
+        id: 'OA-006',
+        type: 'QUOTE_SENT',
+        content: 'Sent initial Rajasthan Royal Heritage quote to agent.',
+        timestamp: '2025-08-31T09:00:00Z',
+        author: 'In-house Operator',
+        agentInvolved: 'Maria Rodriguez',
+      },
+      {
+        id: 'OA-007',
+        type: 'AGENT_MESSAGE',
+        content: 'Agent and client are negotiating price. Client wants to remove one city to lower cost.',
+        timestamp: '2025-09-03T16:00:00Z',
+        author: 'Maria Rodriguez',
+      },
+      {
+        id: 'OA-008',
+        type: 'CALL_SCHEDULED',
+        content: 'Call scheduled with agent Maria to discuss revised itinerary and pricing strategy.',
+        timestamp: '2025-09-04T10:00:00Z',
+        author: 'In-house Operator',
+        agentInvolved: 'Maria Rodriguez',
+      },
+    ],
+    tasks: [
+      {
+        id: 'OT-003',
+        description: 'Finalize negotiation points for Rajasthan tour revision',
+        dueDate: '2025-09-04T15:00:00Z',
+        priority: 'High',
+        isCompleted: false,
+        assignedTo: 'In-house Operator',
+        type: 'AGENT_FOLLOWUP',
+      },
+    ],
+    commissionRate: 18,
+    packageType: 'Rajasthan Royal Heritage',
+    responseTime: '1.8 hours',
+  },
+  {
+    id: 'OL-004',
+    agentName: 'Emma Thompson',
+    agentCompany: 'British Heritage Tours',
+    agentCountry: 'United Kingdom',
+    clientName: 'Anderson Family',
+    clientEmail: 'anderson.travel@yahoo.co.uk',
+    clientPhone: '+44 7890 123456',
+    destination: 'South India Temple Tour',
+    travelDates: { from: '2025-01-10', to: '2025-01-19' },
+    travelerCount: 3,
+    estimatedValue: 6800,
+    status: 'CONFIRMED',
+    temperature: 'HOLD',
+    aiScore: 88,
+    agentRating: 4.9,
+    createdAt: '2025-08-25T11:15:00Z',
+    updatedAt: '2025-09-01T15:30:00Z',
+    activity: [
+      {
+        id: 'OA-009',
+        type: 'AGENT_MESSAGE',
+        content: 'Agent submitted booking request for South India Temple tour. Deposit has been paid.',
+        timestamp: '2025-08-25T11:15:00Z',
+        author: 'System',
+        agentInvolved: 'Emma Thompson',
+      },
+      {
+        id: 'OA-010',
+        type: 'BOOKING_CONFIRMED',
+        content: 'Booking confirmed and all vouchers sent to agent. Final payment due 60 days before travel.',
+        timestamp: '2025-08-26T14:00:00Z',
+        author: 'In-house Operator',
+        agentInvolved: 'Emma Thompson',
+      },
+      {
+        id: 'OA-011',
+        type: 'PAYMENT_RECEIVED',
+        content: 'Received deposit payment of €2,040 from agent.',
+        timestamp: '2025-08-26T14:05:00Z',
+        author: 'System',
+        agentInvolved: 'Emma Thompson',
+      },
+    ],
+    tasks: [
+      {
+        id: 'OT-004',
+        description: 'Send pre-travel documents and final itinerary to agent',
+        dueDate: '2025-11-01T10:00:00Z',
+        priority: 'Medium',
+        isCompleted: false,
+        assignedTo: 'In-house Operator',
+        type: 'BOOKING_CONFIRMATION',
+      },
+    ],
+    commissionRate: 14,
+    packageType: 'South India Temples',
+    responseTime: '1.2 hours',
+  },
+];
+
+export const tourPackagesData: TourPackage[] = [
+  {
+    id: 'PKG-001',
+    name: 'Golden Triangle Classic',
+    destinations: ['Delhi', 'Agra', 'Jaipur'],
+    duration: 7,
+    price: 1850,
+    bookings: 156,
+    revenue: 288600,
+    rating: 4.9,
+    status: 'active',
+    category: 'Cultural'
+  },
+  {
+    id: 'PKG-002',
+    name: 'Kerala Backwater Experience',
+    destinations: ['Kochi', 'Alleppey', 'Munnar'],
+    duration: 8,
+    price: 2100,
+    bookings: 98,
+    revenue: 205800,
+    rating: 4.8,
+    status: 'active',
+    category: 'Nature'
+  },
+  {
+    id: 'PKG-003',
+    name: 'Rajasthan Royal Heritage',
+    destinations: ['Jaipur', 'Udaipur', 'Jodhpur'],
+    duration: 10,
+    price: 2850,
+    bookings: 67,
+    revenue: 190950,
+    rating: 4.9,
+    status: 'active',
+    category: 'Heritage'
+  },
+  {
+    id: 'PKG-004',
+    name: 'South India Temple Trail',
+    destinations: ['Chennai', 'Madurai', 'Kanyakumari'],
+    duration: 9,
+    price: 2200,
+    bookings: 45,
+    revenue: 99000,
+    rating: 4.7,
+    status: 'active',
+    category: 'Spiritual'
+  },
+  {
+    id: 'PKG-005',
+    name: 'Himalayan Adventure Trek',
+    destinations: ['Rishikesh', 'Kedarnath', 'Badrinath'],
+    duration: 12,
+    price: 3200,
+    bookings: 34,
+    revenue: 108800,
+    rating: 4.9,
+    status: 'active',
+    category: 'Adventure'
+  }
+];
+
+export const partnerAgentsData: PartnerAgent[] = [
+  {
+    id: 'AG-001',
+    name: 'Emma Thompson',
+    company: 'British Heritage Tours',
+    country: 'United Kingdom',
+    bookings: 23,
+    revenue: 89750,
+    rating: 4.9,
+    partnership: '3 years',
+    commissionRate: 15,
+    totalClients: 156,
+    responseRate: 98
+  },
+  {
+    id: 'AG-002',
+    name: 'Marco Rossi',
+    company: 'Italian Dreams Travel',
+    country: 'Italy',
+    bookings: 18,
+    revenue: 67200,
+    rating: 4.7,
+    partnership: '2 years',
+    commissionRate: 12,
+    totalClients: 89,
+    responseRate: 95
+  },
+  {
+    id: 'AG-003',
+    name: 'Chen Wei',
+    company: 'Asia Pacific Adventures',
+    country: 'Singapore',
+    bookings: 15,
+    revenue: 52500,
+    rating: 4.8,
+    partnership: '1 year',
+    commissionRate: 18,
+    totalClients: 67,
+    responseRate: 92
+  },
+  {
+    id: 'AG-004',
+    name: 'Sarah Mitchell',
+    company: 'UK Adventure Travel Ltd',
+    country: 'United Kingdom',
+    bookings: 31,
+    revenue: 125600,
+    rating: 4.9,
+    partnership: '4 years',
+    commissionRate: 16,
+    totalClients: 203,
+    responseRate: 97
+  },
+  {
+    id: 'AG-005',
+    name: 'James Wilson',
+    company: 'European Escapes',
+    country: 'Germany',
+    bookings: 12,
+    revenue: 45800,
+    rating: 4.6,
+    partnership: '1 year',
+    commissionRate: 14,
+    totalClients: 78,
+    responseRate: 89
+  }
+];
+
+// Operator business metrics
+export const operatorMetrics = {
+  totalRevenue: 2850000,
+  monthlyRevenue: 285000,
+  activeLeads: 47,
+  hotLeads: 12,
+  conversionRate: 68,
+  avgBookingValue: 3200,
+  agentsWorking: 156,
+  packagesLive: 89,
+  avgResponseTime: 1.8,
+  customerSatisfaction: 4.8,
+  monthlyBookings: 143,
+  repeatBookings: 34
 };

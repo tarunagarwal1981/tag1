@@ -1,6 +1,7 @@
-// app/(main)/operator/page.tsx
-import { DashboardHome } from '@/components/dashboard/common/DashboardHome';
+'use client';
+
+import { OperatorDashboard } from '@/components/dashboard/operator/OperatorDashboard';
 
 export default function OperatorHomePage() {
-  return <DashboardHome />;
+  return <OperatorDashboard />;
 }

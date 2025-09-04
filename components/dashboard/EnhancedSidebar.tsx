@@ -23,6 +23,8 @@ import {
   TrendingUp,
   Award,
   Globe,
+  Package,
+  UserPlus,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
@@ -100,31 +102,47 @@ const agentNavItems: NavItem[] = [
 const operatorNavItems: NavItem[] = [
   { id: 'home', title: 'Dashboard', icon: Home, href: '/operator' },
   {
+    id: 'leads',
+    title: 'Lead Management',
+    icon: Target,
+    href: '/operator/leads',
+    badge: 47,
+    isNew: true,
+  },
+  {
+    id: 'packages',
+    title: 'Package Management',
+    icon: Package,
+    href: '/operator/packages',
+  },
+  {
+    id: 'agents',
+    title: 'Agent Network',
+    icon: Users,
+    href: '/operator/agents',
+    badge: 156,
+  },
+  {
+    id: 'bookings',
+    title: 'Bookings & Operations',
+    icon: Calendar,
+    href: '/operator/bookings',
+  },
+  {
     id: 'analytics',
     title: 'Business Analytics',
     icon: BarChart3,
     href: '/operator/analytics',
   },
   {
-    id: 'agents',
-    title: 'Agent Management',
-    icon: Users,
-    href: '/operator/agents',
+    id: 'communication',
+    title: 'Communication Hub',
+    icon: MessageSquare,
+    href: '/operator/communication',
+    badge: 12,
   },
   {
-    id: 'products',
-    title: 'Product Catalog',
-    icon: LayoutGrid,
-    href: '/operator/products',
-  },
-  {
-    id: 'bookings',
-    title: 'Booking Operations',
-    icon: Calendar,
-    href: '/operator/bookings',
-  },
-  {
-    id: 'performance',
+    id: 'reports',
     title: 'Performance Reports',
     icon: TrendingUp,
     href: '/operator/reports',
@@ -171,8 +189,8 @@ export function EnhancedSidebar({ role }: SidebarProps) {
         </div>
       </div>
 
-      {/* Quick Actions (for agents) */}
-      {role === 'agent' && !isCollapsed && (
+      {/* Quick Actions - Different for each role */}
+      {!isCollapsed && (
         <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-gray-900">
@@ -180,16 +198,30 @@ export function EnhancedSidebar({ role }: SidebarProps) {
             </h3>
             <Zap className="h-4 w-4 text-blue-500" />
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <button className="flex items-center gap-2 p-2 bg-white hover:bg-gray-50 rounded-lg transition-colors text-xs border">
-              <Plus className="h-3 w-3 text-blue-500" />
-              <span>Add Lead</span>
-            </button>
-            <button className="flex items-center gap-2 p-2 bg-white hover:bg-gray-50 rounded-lg transition-colors text-xs border">
-              <Search className="h-3 w-3 text-green-500" />
-              <span>Find Client</span>
-            </button>
-          </div>
+          
+          {role === 'agent' ? (
+            <div className="grid grid-cols-2 gap-2">
+              <button className="flex items-center gap-2 p-2 bg-white hover:bg-gray-50 rounded-lg transition-colors text-xs border">
+                <Plus className="h-3 w-3 text-blue-500" />
+                <span>Add Lead</span>
+              </button>
+              <button className="flex items-center gap-2 p-2 bg-white hover:bg-gray-50 rounded-lg transition-colors text-xs border">
+                <Search className="h-3 w-3 text-green-500" />
+                <span>Find Client</span>
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-2">
+              <button className="flex items-center gap-2 p-2 bg-white hover:bg-gray-50 rounded-lg transition-colors text-xs border">
+                <Package className="h-3 w-3 text-purple-500" />
+                <span>New Package</span>
+              </button>
+              <button className="flex items-center gap-2 p-2 bg-white hover:bg-gray-50 rounded-lg transition-colors text-xs border">
+                <UserPlus className="h-3 w-3 text-green-500" />
+                <span>Invite Agent</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -257,29 +289,51 @@ export function EnhancedSidebar({ role }: SidebarProps) {
         </ul>
       </nav>
 
-      {/* Performance Summary (for agents) */}
-      {role === 'agent' && !isCollapsed && (
+      {/* Performance Summary - Different for each role */}
+      {!isCollapsed && (
         <div className="p-4 border-t border-gray-200 bg-gray-50">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-gray-900">
-              Today's Summary
+              {role === 'agent' ? "Today's Summary" : "Business Overview"}
             </h3>
             <Award className="h-4 w-4 text-yellow-500" />
           </div>
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="p-2 bg-white rounded-lg">
-              <div className="text-lg font-bold text-blue-600">12</div>
-              <div className="text-xs text-gray-600">Calls</div>
+          
+          {role === 'agent' ? (
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="p-2 bg-white rounded-lg">
+                <div className="text-lg font-bold text-blue-600">12</div>
+                <div className="text-xs text-gray-600">Calls</div>
+              </div>
+              <div className="p-2 bg-white rounded-lg">
+                <div className="text-lg font-bold text-green-600">8</div>
+                <div className="text-xs text-gray-600">Emails</div>
+              </div>
+              <div className="p-2 bg-white rounded-lg">
+                <div className="text-lg font-bold text-purple-600">3</div>
+                <div className="text-xs text-gray-600">Bookings</div>
+              </div>
             </div>
-            <div className="p-2 bg-white rounded-lg">
-              <div className="text-lg font-bold text-green-600">8</div>
-              <div className="text-xs text-gray-600">Emails</div>
+          ) : (
+            <div className="grid grid-cols-2 gap-2 text-center">
+              <div className="p-2 bg-white rounded-lg">
+                <div className="text-lg font-bold text-emerald-600">$285K</div>
+                <div className="text-xs text-gray-600">Monthly Rev</div>
+              </div>
+              <div className="p-2 bg-white rounded-lg">
+                <div className="text-lg font-bold text-blue-600">68%</div>
+                <div className="text-xs text-gray-600">Conversion</div>
+              </div>
+              <div className="p-2 bg-white rounded-lg">
+                <div className="text-lg font-bold text-purple-600">156</div>
+                <div className="text-xs text-gray-600">Agents</div>
+              </div>
+              <div className="p-2 bg-white rounded-lg">
+                <div className="text-lg font-bold text-amber-600">4.8★</div>
+                <div className="text-xs text-gray-600">Rating</div>
+              </div>
             </div>
-            <div className="p-2 bg-white rounded-lg">
-              <div className="text-lg font-bold text-purple-600">3</div>
-              <div className="text-xs text-gray-600">Bookings</div>
-            </div>
-          </div>
+          )}
         </div>
       )}
 
@@ -287,14 +341,23 @@ export function EnhancedSidebar({ role }: SidebarProps) {
       <div className="p-4 border-t border-gray-200">
         {!isCollapsed ? (
           <div className="space-y-3">
-            {/* User Profile */}
+            {/* User Profile - Different for each role */}
             <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
-                A
+              <div className={cn(
+                "w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold",
+                role === 'agent' 
+                  ? "bg-gradient-to-r from-purple-500 to-pink-500"
+                  : "bg-gradient-to-r from-emerald-500 to-teal-500"
+              )}>
+                {role === 'agent' ? 'A' : 'IT'}
               </div>
               <div className="flex-1">
-                <p className="font-medium text-gray-900">Anya Sharma</p>
-                <p className="text-xs text-gray-500">Travel Agent • Pro Plan</p>
+                <p className="font-medium text-gray-900">
+                  {role === 'agent' ? 'Anya Sharma' : 'Incredible India Tours'}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {role === 'agent' ? 'Travel Agent • Pro Plan' : 'Tour Operator • Premium'}
+                </p>
               </div>
               <Bell className="h-4 w-4 text-gray-400" />
             </div>
