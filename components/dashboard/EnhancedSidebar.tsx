@@ -1,14 +1,11 @@
-// Enhanced Modern Sidebar - components/dashboard/EnhancedSidebar.tsx
-
+// components/dashboard/EnhancedSidebar.tsx
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   PlaneTakeoff,
-  LogOut,
   Home,
-  LayoutGrid,
   Target,
   Brain,
   MessageSquare,
@@ -16,18 +13,25 @@ import {
   BarChart3,
   Users,
   Settings,
-  Bell,
   Search,
   Plus,
   Zap,
-  TrendingUp,
-  Award,
   Globe,
   Package,
   UserPlus,
+  ChevronLeft,
+  Bell,
+  Award,
+  CreditCard,
+  FileText,
+  TrendingUp,
+  Building2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { Badge } from '@/components/ui/core/Badge';
+import { Button } from '@/components/ui/core/Button';
+import { Avatar } from '@/components/ui/core/Avatar';
 
 interface NavItem {
   id: string;
@@ -36,53 +40,30 @@ interface NavItem {
   href: string;
   badge?: number;
   isNew?: boolean;
+  description?: string;
 }
 
 interface SidebarProps {
   role: 'agent' | 'operator';
 }
 
+// Streamlined navigation items based on our analysis
 const agentNavItems: NavItem[] = [
-  { id: 'home', title: 'Dashboard', icon: Home, href: '/agent' },
+  { 
+    id: 'dashboard', 
+    title: 'Overview', 
+    icon: Home, 
+    href: '/agent',
+    description: 'Your performance dashboard'
+  },
   {
     id: 'lead-hub',
-    title: 'Lead Management',
+    title: 'Lead Hub',
     icon: Target,
     href: '/agent/lead-hub',
     badge: 8,
     isNew: true,
-  },
-  {
-    id: 'ai-assistant',
-    title: 'AI Assistant',
-    icon: Brain,
-    href: '/agent/ai-assistant',
-    isNew: true,
-  },
-  {
-    id: 'communication',
-    title: 'Communication Hub',
-    icon: MessageSquare,
-    href: '/agent/communication',
-    badge: 3,
-  },
-  {
-    id: 'calendar',
-    title: 'Schedule & Tasks',
-    icon: Calendar,
-    href: '/agent/calendar',
-  },
-  {
-    id: 'analytics',
-    title: 'Performance Analytics',
-    icon: BarChart3,
-    href: '/agent/analytics',
-  },
-  {
-    id: 'my-itineraries',
-    title: 'Itineraries',
-    icon: LayoutGrid,
-    href: '/agent/my-itineraries',
+    description: 'Manage leads & AI assistant'
   },
   {
     id: 'marketplace',
@@ -90,30 +71,62 @@ const agentNavItems: NavItem[] = [
     icon: Globe,
     href: '/agent/buy-leads',
     badge: 12,
+    description: 'Buy qualified leads'
   },
   {
-    id: 'team',
-    title: 'Team & Collaboration',
-    icon: Users,
-    href: '/agent/team',
+    id: 'packages',
+    title: 'My Packages',
+    icon: Package,
+    href: '/agent/my-itineraries',
+    description: 'Bookings & itineraries'
   },
+  {
+    id: 'communication',
+    title: 'Messages',
+    icon: MessageSquare,
+    href: '/agent/communication',
+    badge: 3,
+    description: 'WhatsApp & email hub'
+  },
+  {
+    id: 'analytics',
+    title: 'Analytics',
+    icon: BarChart3,
+    href: '/agent/analytics',
+    description: 'Performance insights'
+  },
+  {
+    id: 'calendar',
+    title: 'Calendar',
+    icon: Calendar,
+    href: '/agent/calendar',
+    description: 'Schedule & tasks'
+  }
 ];
 
 const operatorNavItems: NavItem[] = [
-  { id: 'home', title: 'Dashboard', icon: Home, href: '/operator' },
+  { 
+    id: 'dashboard', 
+    title: 'Overview', 
+    icon: Home, 
+    href: '/operator',
+    description: 'Business dashboard'
+  },
   {
-    id: 'leads',
-    title: 'Lead Management',
-    icon: Target,
+    id: 'lead-generation',
+    title: 'Lead Generation',
+    icon: Zap,
     href: '/operator/leads',
     badge: 47,
     isNew: true,
+    description: 'AI-powered lead generation'
   },
   {
     id: 'packages',
     title: 'Package Management',
     icon: Package,
     href: '/operator/packages',
+    description: 'Create & manage tours'
   },
   {
     id: 'agents',
@@ -121,32 +134,37 @@ const operatorNavItems: NavItem[] = [
     icon: Users,
     href: '/operator/agents',
     badge: 156,
+    description: 'Partner relationships'
   },
   {
     id: 'bookings',
-    title: 'Bookings & Operations',
+    title: 'Bookings',
     icon: Calendar,
     href: '/operator/bookings',
-  },
-  {
-    id: 'analytics',
-    title: 'Business Analytics',
-    icon: BarChart3,
-    href: '/operator/analytics',
+    description: 'Operations management'
   },
   {
     id: 'communication',
-    title: 'Communication Hub',
+    title: 'Messages',
     icon: MessageSquare,
     href: '/operator/communication',
     badge: 12,
+    description: 'Agent communications'
   },
   {
-    id: 'reports',
-    title: 'Performance Reports',
+    id: 'analytics',
+    title: 'Analytics',
     icon: TrendingUp,
-    href: '/operator/reports',
+    href: '/operator/analytics',
+    description: 'Business intelligence'
   },
+  {
+    id: 'payments',
+    title: 'Payments',
+    icon: CreditCard,
+    href: '/operator/payments',
+    description: 'Revenue & commissions'
+  }
 ];
 
 export function EnhancedSidebar({ role }: SidebarProps) {
@@ -154,19 +172,28 @@ export function EnhancedSidebar({ role }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const navItems = role === 'agent' ? agentNavItems : operatorNavItems;
+  
+  // Mock user data - would come from auth context in real app
+  const userData = {
+    name: role === 'agent' ? 'Anya Sharma' : 'Incredible India Tours',
+    email: role === 'agent' ? 'anya@travelagency.com' : 'info@incredibleindiatours.com',
+    avatar: role === 'agent' ? 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150' : 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=150',
+    plan: role === 'agent' ? 'Professional' : 'Enterprise',
+    notifications: role === 'agent' ? 3 : 8
+  };
 
   return (
     <aside
       className={cn(
-        'bg-white border-r border-gray-200 flex flex-col shadow-sm transition-all duration-300',
-        isCollapsed ? 'w-16' : 'w-72'
+        'bg-white border-r border-gray-200 flex flex-col shadow-sm transition-all duration-300 relative z-40',
+        isCollapsed ? 'w-20' : 'w-80'
       )}
     >
       {/* Header */}
-      <div className="p-6 border-b border-gray-200">
+      <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-primary-50 to-primary-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl flex items-center justify-center shadow-lg">
               <PlaneTakeoff className="h-5 w-5 text-white" />
             </div>
             {!isCollapsed && (
@@ -174,60 +201,120 @@ export function EnhancedSidebar({ role }: SidebarProps) {
                 <h1 className="text-xl font-bold text-gray-900">
                   TravelHub Pro
                 </h1>
-                <p className="text-xs text-gray-500 capitalize">
+                <p className="text-xs text-primary-600 font-medium capitalize">
                   {role} Dashboard
                 </p>
               </div>
             )}
           </div>
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="h-8 w-8 p-0 hover:bg-white/50"
           >
-            <LayoutGrid className="h-4 w-4 text-gray-500" />
-          </button>
+            <ChevronLeft className={cn(
+              "h-4 w-4 text-gray-500 transition-transform duration-200",
+              isCollapsed && "rotate-180"
+            )} />
+          </Button>
         </div>
       </div>
 
-      {/* Quick Actions - Different for each role */}
+      {/* User Profile Section */}
       {!isCollapsed && (
-        <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div className="p-4 border-b border-gray-200 bg-gray-50/50">
+          <div className="flex items-center gap-3">
+            <Avatar 
+              src={userData.avatar}
+              alt={userData.name}
+              size="md"
+              fallback={userData.name.slice(0, 2)}
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900 truncate">
+                {userData.name}
+              </p>
+              <p className="text-xs text-gray-500 truncate">
+                {userData.email}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="info" size="sm">
+                {userData.plan}
+              </Badge>
+              {userData.notifications > 0 && (
+                <div className="relative">
+                  <Bell className="h-4 w-4 text-gray-400" />
+                  <div className="absolute -top-1 -right-1 h-3 w-3 bg-danger-500 rounded-full flex items-center justify-center">
+                    <span className="text-[10px] text-white font-medium">
+                      {userData.notifications > 9 ? '9+' : userData.notifications}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Actions */}
+      {!isCollapsed && (
+        <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-gray-900">
               Quick Actions
             </h3>
-            <Zap className="h-4 w-4 text-blue-500" />
+            <Zap className="h-4 w-4 text-primary-500" />
           </div>
           
-          {role === 'agent' ? (
-            <div className="grid grid-cols-2 gap-2">
-              <button className="flex items-center gap-2 p-2 bg-white hover:bg-gray-50 rounded-lg transition-colors text-xs border">
-                <Plus className="h-3 w-3 text-blue-500" />
-                <span>Add Lead</span>
-              </button>
-              <button className="flex items-center gap-2 p-2 bg-white hover:bg-gray-50 rounded-lg transition-colors text-xs border">
-                <Search className="h-3 w-3 text-green-500" />
-                <span>Find Client</span>
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-2">
-              <button className="flex items-center gap-2 p-2 bg-white hover:bg-gray-50 rounded-lg transition-colors text-xs border">
-                <Package className="h-3 w-3 text-purple-500" />
-                <span>New Package</span>
-              </button>
-              <button className="flex items-center gap-2 p-2 bg-white hover:bg-gray-50 rounded-lg transition-colors text-xs border">
-                <UserPlus className="h-3 w-3 text-green-500" />
-                <span>Invite Agent</span>
-              </button>
-            </div>
-          )}
+          <div className="grid grid-cols-2 gap-2">
+            {role === 'agent' ? (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="justify-start text-xs h-8"
+                  icon={<Plus className="h-3 w-3" />}
+                >
+                  Add Lead
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="justify-start text-xs h-8"
+                  icon={<Search className="h-3 w-3" />}
+                >
+                  Find Package
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="justify-start text-xs h-8"
+                  icon={<Package className="h-3 w-3" />}
+                >
+                  New Package
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="justify-start text-xs h-8"
+                  icon={<UserPlus className="h-3 w-3" />}
+                >
+                  Invite Agent
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       )}
 
       {/* Navigation */}
-      <nav className="flex-1 p-4">
-        <ul className="space-y-1">
+      <nav className="flex-1 p-4 custom-scrollbar overflow-y-auto">
+        <ul className="space-y-2">
           {navItems.map((item) => {
             const isActive =
               pathname === item.href ||
@@ -238,45 +325,53 @@ export function EnhancedSidebar({ role }: SidebarProps) {
                 <Link
                   href={item.href}
                   className={cn(
-                    'flex items-center p-3 rounded-xl font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 group relative',
-                    isActive &&
-                      'bg-blue-100 text-blue-700 font-semibold shadow-sm',
-                    isCollapsed ? 'justify-center' : 'space-x-3'
+                    'group flex items-center px-3 py-2.5 rounded-xl font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-all duration-200 relative',
+                    isActive && 'bg-primary-50 text-primary-700 shadow-sm border border-primary-200',
+                    isCollapsed ? 'justify-center' : 'justify-start'
                   )}
                 >
-                  <item.icon
-                    className={cn(
-                      'h-5 w-5 flex-shrink-0',
-                      isActive && 'text-blue-600'
-                    )}
-                  />
-
+                  <div className={cn(
+                    'flex items-center justify-center rounded-lg transition-colors duration-200',
+                    isActive ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600',
+                    isCollapsed ? 'w-8 h-8' : 'w-6 h-6 mr-3'
+                  )}>
+                    <item.icon className="h-5 w-5" />
+                  </div>
+                  
                   {!isCollapsed && (
                     <>
-                      <span className="flex-1">{item.title}</span>
-
-                      <div className="flex items-center gap-2">
-                        {item.isNew && (
-                          <span className="bg-gradient-to-r from-green-400 to-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">
-                            NEW
-                          </span>
-                        )}
-
-                        {item.badge && (
-                          <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">
-                            {item.badge}
-                          </span>
-                        )}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">{item.title}</span>
+                          {item.isNew && (
+                            <Badge variant="success" size="sm">
+                              New
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          {item.description}
+                        </p>
                       </div>
+                      
+                      {item.badge && (
+                        <Badge 
+                          variant={isActive ? 'info' : 'default'} 
+                          size="sm"
+                          className="ml-2"
+                        >
+                          {item.badge > 99 ? '99+' : item.badge}
+                        </Badge>
+                      )}
                     </>
                   )}
-
-                  {/* Tooltip for collapsed mode */}
+                  
+                  {/* Collapsed state tooltip */}
                   {isCollapsed && (
-                    <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-nowrap">
+                    <div className="absolute left-16 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
                       {item.title}
                       {item.badge && (
-                        <span className="ml-2 bg-red-500 px-1 rounded-full text-xs">
+                        <span className="ml-2 bg-white/20 px-1.5 py-0.5 rounded">
                           {item.badge}
                         </span>
                       )}
@@ -289,108 +384,34 @@ export function EnhancedSidebar({ role }: SidebarProps) {
         </ul>
       </nav>
 
-      {/* Performance Summary - Different for each role */}
-      {!isCollapsed && (
-        <div className="p-4 border-t border-gray-200 bg-gray-50">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gray-900">
-              {role === 'agent' ? "Today's Summary" : "Business Overview"}
-            </h3>
-            <Award className="h-4 w-4 text-yellow-500" />
-          </div>
-          
-          {role === 'agent' ? (
-            <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="p-2 bg-white rounded-lg">
-                <div className="text-lg font-bold text-blue-600">12</div>
-                <div className="text-xs text-gray-600">Calls</div>
-              </div>
-              <div className="p-2 bg-white rounded-lg">
-                <div className="text-lg font-bold text-green-600">8</div>
-                <div className="text-xs text-gray-600">Emails</div>
-              </div>
-              <div className="p-2 bg-white rounded-lg">
-                <div className="text-lg font-bold text-purple-600">3</div>
-                <div className="text-xs text-gray-600">Bookings</div>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-2 text-center">
-              <div className="p-2 bg-white rounded-lg">
-                <div className="text-lg font-bold text-emerald-600">$285K</div>
-                <div className="text-xs text-gray-600">Monthly Rev</div>
-              </div>
-              <div className="p-2 bg-white rounded-lg">
-                <div className="text-lg font-bold text-blue-600">68%</div>
-                <div className="text-xs text-gray-600">Conversion</div>
-              </div>
-              <div className="p-2 bg-white rounded-lg">
-                <div className="text-lg font-bold text-purple-600">156</div>
-                <div className="text-xs text-gray-600">Agents</div>
-              </div>
-              <div className="p-2 bg-white rounded-lg">
-                <div className="text-lg font-bold text-amber-600">4.8★</div>
-                <div className="text-xs text-gray-600">Rating</div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* User Profile & Settings */}
-      <div className="p-4 border-t border-gray-200">
+      {/* Footer */}
+      <div className="p-4 border-t border-gray-200 bg-gray-50/50">
         {!isCollapsed ? (
-          <div className="space-y-3">
-            {/* User Profile - Different for each role */}
-            <div className="flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
-              <div className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold",
-                role === 'agent' 
-                  ? "bg-gradient-to-r from-purple-500 to-pink-500"
-                  : "bg-gradient-to-r from-emerald-500 to-teal-500"
-              )}>
-                {role === 'agent' ? 'A' : 'IT'}
+          <div className="space-y-2">
+            <Link
+              href={`/${role}/settings`}
+              className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-all duration-200"
+            >
+              <Settings className="h-4 w-4" />
+              <span className="text-sm">Settings</span>
+            </Link>
+            
+            <div className="pt-2 border-t border-gray-200">
+              <div className="flex items-center justify-between text-xs text-gray-500">
+                <span>TravelHub Pro v2.1</span>
+                <Award className="h-3 w-3" />
               </div>
-              <div className="flex-1">
-                <p className="font-medium text-gray-900">
-                  {role === 'agent' ? 'Anya Sharma' : 'Incredible India Tours'}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {role === 'agent' ? 'Travel Agent • Pro Plan' : 'Tour Operator • Premium'}
-                </p>
-              </div>
-              <Bell className="h-4 w-4 text-gray-400" />
-            </div>
-
-            {/* Settings & Logout */}
-            <div className="flex space-x-2">
-              <Link
-                href={`/${role}/settings`}
-                className="flex-1 flex items-center justify-center space-x-2 p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <Settings className="h-4 w-4" />
-                <span className="text-sm">Settings</span>
-              </Link>
-              <button className="flex-1 flex items-center justify-center space-x-2 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                <LogOut className="h-4 w-4" />
-                <span className="text-sm">Logout</span>
-              </button>
             </div>
           </div>
         ) : (
-          <div className="space-y-2">
-            <button className="w-full p-3 hover:bg-gray-100 rounded-lg transition-colors group relative">
-              <Settings className="h-5 w-5 text-gray-500 mx-auto" />
-              <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                Settings
-              </div>
-            </button>
-            <button className="w-full p-3 hover:bg-red-50 rounded-lg transition-colors group relative">
-              <LogOut className="h-5 w-5 text-red-500 mx-auto" />
-              <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                Logout
-              </div>
-            </button>
+          <div className="flex flex-col items-center space-y-2">
+            <Link
+              href={`/${role}/settings`}
+              className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-all duration-200"
+            >
+              <Settings className="h-4 w-4" />
+            </Link>
+            <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
           </div>
         )}
       </div>

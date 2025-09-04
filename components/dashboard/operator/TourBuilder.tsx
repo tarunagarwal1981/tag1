@@ -1300,4 +1300,4 @@ const PublishStep: React.FC<StepProps> = ({ data, onChange }) => {
       </div>
     </div>
   );
-};
+}; 
