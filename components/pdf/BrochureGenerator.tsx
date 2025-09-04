@@ -6,11 +6,12 @@ import {
   Download, FileText, Mail, MessageSquare, Share2, 
   Printer, Eye, Settings, Palette, Layout, Globe,
   CheckCircle2, Clock, MapPin, Users, DollarSign,
-  Star, Calendar, Camera, Phone
+  Star, Calendar, Camera, Phone, X
 } from 'lucide-react';
 import { TourPackage } from '@/lib/tourPackageData';
 import { cn } from '@/lib/utils';
 
+// Main Brochure Generator Component
 interface BrochureGeneratorProps {
   package: TourPackage;
   onClose: () => void;
@@ -60,15 +61,11 @@ export function BrochureGenerator({ package: pkg, onClose }: BrochureGeneratorPr
   const handleGeneratePDF = async () => {
     setIsGenerating(true);
     
-    // Simulate PDF generation
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    // In a real application, you would make an API call here to generate the PDF.
+    // For this prototype, we will simulate the process.
+    await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // In a real app, you would:
-    // 1. Send package data to your PDF generation API
-    // 2. Get back a PDF URL or blob
-    // 3. Trigger download or open in new tab
-    
-    const blob = new Blob(['Sample PDF content'], { type: 'application/pdf' });
+    const blob = new Blob(['Sample PDF content for: ' + pkg.title], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -100,29 +97,30 @@ export function BrochureGenerator({ package: pkg, onClose }: BrochureGeneratorPr
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
         {/* Header */}
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold text-gray-900">Generate Package Brochure</h2>
-            <p className="text-gray-600 mt-1">Create a professional PDF brochure for "{pkg.title}"</p>
+            <p className="text-sm text-gray-600 mt-1">Create a professional PDF brochure for "{pkg.title}"</p>
           </div>
           <button 
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg"
+            className="p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 rounded-lg transition-colors"
+            aria-label="Close"
           >
-            ✕
+            <X className="h-6 w-6" />
           </button>
         </div>
 
-        <div className="flex">
+        <div className="flex flex-col lg:flex-row">
           {/* Settings Panel */}
-          <div className="w-1/3 border-r border-gray-200 p-6 space-y-6">
+          <div className="w-full lg:w-1/3 border-r border-gray-200 p-6 space-y-6">
             {/* Template Selection */}
             <div>
               <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <Layout className="h-4 w-4" />
-                Template
+                <Layout className="h-4 w-4 text-blue-500" />
+                Brochure Template
               </h3>
               <div className="grid grid-cols-2 gap-3">
                 {templates.map((template) => (
@@ -130,7 +128,7 @@ export function BrochureGenerator({ package: pkg, onClose }: BrochureGeneratorPr
                     key={template.id}
                     onClick={() => setSelectedTemplate(template.id)}
                     className={cn(
-                      'border-2 rounded-lg p-3 cursor-pointer transition-colors',
+                      'border-2 rounded-lg p-3 cursor-pointer transition-all',
                       selectedTemplate === template.id 
                         ? 'border-blue-500 bg-blue-50' 
                         : 'border-gray-200 hover:border-gray-300'
@@ -147,34 +145,34 @@ export function BrochureGenerator({ package: pkg, onClose }: BrochureGeneratorPr
             {/* Content Options */}
             <div>
               <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Include Content
+                <FileText className="h-4 w-4 text-green-500" />
+                Content to Include
               </h3>
               <div className="space-y-3">
-                <label className="flex items-center gap-2">
+                <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={includeItinerary}
                     onChange={(e) => setIncludeItinerary(e.target.checked)}
-                    className="rounded border-gray-300"
+                    className="rounded text-blue-600 focus:ring-blue-500"
                   />
                   <span className="text-sm text-gray-700">Full Itinerary</span>
                 </label>
-                <label className="flex items-center gap-2">
+                <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={includeImages}
                     onChange={(e) => setIncludeImages(e.target.checked)}
-                    className="rounded border-gray-300"
+                    className="rounded text-blue-600 focus:ring-blue-500"
                   />
                   <span className="text-sm text-gray-700">Package Images</span>
                 </label>
-                <label className="flex items-center gap-2">
+                <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={includeTerms}
                     onChange={(e) => setIncludeTerms(e.target.checked)}
-                    className="rounded border-gray-300"
+                    className="rounded text-blue-600 focus:ring-blue-500"
                   />
                   <span className="text-sm text-gray-700">Terms & Conditions</span>
                 </label>
@@ -184,7 +182,7 @@ export function BrochureGenerator({ package: pkg, onClose }: BrochureGeneratorPr
             {/* Branding */}
             <div>
               <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                <Palette className="h-4 w-4" />
+                <Palette className="h-4 w-4 text-purple-500" />
                 Branding
               </h3>
               <div className="space-y-3">
@@ -196,7 +194,7 @@ export function BrochureGenerator({ package: pkg, onClose }: BrochureGeneratorPr
                     type="text"
                     value={branding.companyName}
                     onChange={(e) => setBranding({ ...branding, companyName: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
                 <div>
@@ -207,7 +205,7 @@ export function BrochureGenerator({ package: pkg, onClose }: BrochureGeneratorPr
                     type="email"
                     value={branding.contactEmail}
                     onChange={(e) => setBranding({ ...branding, contactEmail: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
                 <div>
@@ -218,7 +216,7 @@ export function BrochureGenerator({ package: pkg, onClose }: BrochureGeneratorPr
                     type="tel"
                     value={branding.contactPhone}
                     onChange={(e) => setBranding({ ...branding, contactPhone: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
                 <div>
@@ -229,18 +227,18 @@ export function BrochureGenerator({ package: pkg, onClose }: BrochureGeneratorPr
                     type="url"
                     value={branding.website}
                     onChange={(e) => setBranding({ ...branding, website: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Generate Button */}
+            {/* Generate Button & Quick Share */}
             <div className="pt-4 border-t border-gray-200">
               <button
                 onClick={handleGeneratePDF}
                 disabled={isGenerating}
-                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
               >
                 {isGenerating ? (
                   <>
@@ -255,30 +253,29 @@ export function BrochureGenerator({ package: pkg, onClose }: BrochureGeneratorPr
                 )}
               </button>
 
-              {/* Quick Share Options */}
               <div className="mt-4">
                 <div className="text-xs font-medium text-gray-700 mb-2">Quick Share:</div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleQuickShare('whatsapp')}
-                    className="flex-1 bg-green-500 text-white py-2 rounded text-xs hover:bg-green-600 flex items-center justify-center gap-1"
+                    className="flex-1 bg-green-500 text-white py-2 rounded text-xs hover:bg-green-600 flex items-center justify-center gap-1 transition-colors"
                   >
                     <MessageSquare className="h-3 w-3" />
                     WhatsApp
                   </button>
                   <button
                     onClick={() => handleQuickShare('email')}
-                    className="flex-1 bg-blue-500 text-white py-2 rounded text-xs hover:bg-blue-600 flex items-center justify-center gap-1"
+                    className="flex-1 bg-blue-500 text-white py-2 rounded text-xs hover:bg-blue-600 flex items-center justify-center gap-1 transition-colors"
                   >
                     <Mail className="h-3 w-3" />
                     Email
                   </button>
                   <button
                     onClick={() => handleQuickShare('copy')}
-                    className="flex-1 bg-gray-500 text-white py-2 rounded text-xs hover:bg-gray-600 flex items-center justify-center gap-1"
+                    className="flex-1 bg-gray-500 text-white py-2 rounded text-xs hover:bg-gray-600 flex items-center justify-center gap-1 transition-colors"
                   >
                     <Share2 className="h-3 w-3" />
-                    Copy
+                    Copy Link
                   </button>
                 </div>
               </div>
@@ -290,8 +287,8 @@ export function BrochureGenerator({ package: pkg, onClose }: BrochureGeneratorPr
             <div className="h-full">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Eye className="h-4 w-4" />
-                  Preview
+                  <Eye className="h-4 w-4 text-gray-500" />
+                  Live Preview
                 </h3>
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <Printer className="h-4 w-4" />
@@ -301,7 +298,7 @@ export function BrochureGenerator({ package: pkg, onClose }: BrochureGeneratorPr
 
               {/* PDF Preview */}
               <div className={cn(
-                'bg-white border border-gray-300 rounded-lg shadow-lg p-8 h-full overflow-y-auto',
+                'bg-white border border-gray-300 rounded-lg shadow-inner p-8 h-[70vh] lg:h-[80vh] overflow-y-auto',
                 selectedTemplate === 'professional' && 'bg-gradient-to-br from-blue-50 to-white',
                 selectedTemplate === 'colorful' && 'bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50',
                 selectedTemplate === 'minimal' && 'bg-gradient-to-br from-gray-50 to-white',
@@ -324,7 +321,10 @@ export function BrochureGenerator({ package: pkg, onClose }: BrochureGeneratorPr
   );
 }
 
-// Brochure Preview Component
+// ---
+// Brochure Preview Component (Correctly Exported)
+// ---
+
 interface BrochurePreviewProps {
   package: TourPackage;
   template: string;
@@ -334,7 +334,7 @@ interface BrochurePreviewProps {
   includeTerms: boolean;
 }
 
-const BrochurePreview: React.FC<BrochurePreviewProps> = ({ 
+export const BrochurePreview: React.FC<BrochurePreviewProps> = ({ 
   package: pkg, 
   template, 
   branding,
@@ -366,7 +366,7 @@ const BrochurePreview: React.FC<BrochurePreviewProps> = ({
       <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">{pkg.title}</h1>
         <div className={cn('inline-block px-4 py-2 rounded-full text-sm font-medium', colors.accent, colors.primary)}>
-          {pkg.category.charAt(0) + pkg.category.slice(1).toLowerCase()} Tour
+          {pkg.category.charAt(0).toUpperCase() + pkg.category.slice(1).toLowerCase()} Tour
         </div>
       </div>
 
@@ -409,7 +409,7 @@ const BrochurePreview: React.FC<BrochurePreviewProps> = ({
           <div className="grid grid-cols-1 gap-2">
             {pkg.highlights.slice(0, 6).map((highlight, index) => (
               <div key={index} className="flex items-start gap-2">
-                <Star className={cn('h-4 w-4 mt-0.5 flex-shrink-0', colors.primary)} />
+                <Star className={cn('h-4 w-4 mt-0.5 flex-shrink-0 text-yellow-500', colors.primary === 'text-amber-600' ? '' : 'text-yellow-500')} />
                 <span className="text-gray-700">{highlight}</span>
               </div>
             ))}
@@ -423,7 +423,7 @@ const BrochurePreview: React.FC<BrochurePreviewProps> = ({
           <h2 className={cn('text-lg font-semibold mb-3', colors.primary)}>Day-by-Day Itinerary</h2>
           <div className="space-y-3">
             {pkg.itinerary.slice(0, 3).map((day, index) => (
-              <div key={index} className={cn('border-l-4 pl-4 py-2', colors.border)}>
+              <div key={day.day} className={cn('border-l-4 pl-4 py-2', colors.border)}>
                 <div className="font-semibold text-gray-900">Day {day.day}: {day.title}</div>
                 <div className="text-gray-600 text-xs mt-1">{day.description}</div>
                 {day.highlights && day.highlights.length > 0 && (
@@ -435,7 +435,7 @@ const BrochurePreview: React.FC<BrochurePreviewProps> = ({
               </div>
             ))}
             {pkg.itinerary.length > 3 && (
-              <div className="text-center text-gray-500 text-xs">
+              <div className="text-center text-gray-500 text-xs mt-2">
                 ... and {pkg.itinerary.length - 3} more days
               </div>
             )}
@@ -464,7 +464,7 @@ const BrochurePreview: React.FC<BrochurePreviewProps> = ({
           <h2 className={cn('text-lg font-semibold mb-3', colors.primary)}>Gallery</h2>
           <div className="grid grid-cols-3 gap-2">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="aspect-video bg-gray-200 rounded flex items-center justify-center">
+              <div key={i} className="aspect-video bg-gray-200 rounded-lg flex items-center justify-center">
                 <Camera className="h-6 w-6 text-gray-400" />
               </div>
             ))}
@@ -476,13 +476,13 @@ const BrochurePreview: React.FC<BrochurePreviewProps> = ({
       {includeTerms && (
         <div className="text-xs text-gray-500">
           <h2 className="font-semibold mb-2">Terms & Conditions</h2>
-          <p>{pkg.metadata?.cancellationPolicy || 'Standard cancellation policy applies.'}</p>
+          <p>{pkg.metadata?.cancellationPolicy || 'Standard cancellation policy applies. Specific details are available upon request or booking confirmation.'}</p>
         </div>
       )}
 
       {/* Contact Footer */}
-      <div className={cn('border-t pt-4 text-center', colors.border)}>
-        <div className="font-semibold text-gray-900 mb-2">Ready to Book?</div>
+      <div className={cn('border-t pt-4 text-center mt-6', colors.border)}>
+        <div className="font-semibold text-gray-900 mb-2">Ready to Book? Contact Us!</div>
         <div className="space-y-1 text-xs text-gray-600">
           <div className="flex items-center justify-center gap-2">
             <Mail className="h-3 w-3" />
