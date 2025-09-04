@@ -1305,7 +1305,7 @@ export const followUpScenarios = [
     urgency: 'Critical - Quote revision overdue by 3 days',
   },
   {
-    leadId: 'LEAD-010',
+    leadId: 'LEAD-010', 
     scenario: 'pre_travel_preparation',
     nextActions: [
       'Collect final payment (€5,950)',
