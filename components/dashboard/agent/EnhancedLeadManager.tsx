@@ -742,7 +742,7 @@ const TimelineLeadCard: React.FC<TimelineLeadCardProps> = ({ lead, onClick }) =>
 };
 
 // Main Component
-export function CompleteLeadManager() {
+export function EnhancedLeadManager({ userRole }: { userRole: 'agent' | 'operator' }) {
   const [viewMode, setViewMode] = useState<ViewMode>('timeline');
   const [filter, setFilter] = useState<FilterType>('all');
   const [searchTerm, setSearchTerm] = useState('');

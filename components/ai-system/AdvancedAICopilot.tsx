@@ -1,4 +1,4 @@
-// components/ai-system/AdvancedAICopilot.tsx
+// File: components/ai-system/AdvancedAICopilot.tsx
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -46,7 +46,8 @@ import {
   Image,
   Paperclip,
   BookOpen,
-  Star
+  Star,
+  Activity
 } from 'lucide-react';
 import { Button } from '@/components/ui/core/Button';
 import { Card } from '@/components/ui/core/Card';
@@ -54,6 +55,9 @@ import { Badge } from '@/components/ui/core/Badge';
 import { Input } from '@/components/ui/core/Input';
 import { Avatar } from '@/components/ui/core/Avatar';
 import { cn, formatCurrency, formatRelativeTime } from '@/lib/utils';
+import { Separator } from '@/components/ui/core/Separator';
+import { Switch } from '@/components/ui/core/Switch';
+import { Progress } from '@/components/ui/core/Progress';
 
 // Enhanced AI System Types
 export interface AIPersonality {
@@ -191,6 +195,274 @@ const AI_PERSONALITIES: AIPersonality[] = [
   }
 ];
 
+// Sub-components
+const AIInsightCard: React.FC<{
+  insight: AIInsight;
+  onRead: () => void;
+  onAction?: () => void;
+}> = ({ insight, onRead, onAction }) => {
+  const iconMap = {
+    'urgent': <AlertTriangle className="h-5 w-5 text-red-600" />,
+    'opportunity': <TrendingUp className="h-5 w-5 text-green-600" />,
+    'warning': <AlertTriangle className="h-5 w-5 text-yellow-600" />,
+    'success': <CheckCircle className="h-5 w-5 text-green-600" />,
+    'info': <Lightbulb className="h-5 w-5 text-blue-600" />,
+    'prediction': <Clock className="h-5 w-5 text-purple-600" />,
+  };
+
+  const colorMap = {
+    'urgent': 'border-red-500 bg-red-50',
+    'opportunity': 'border-green-500 bg-green-50',
+    'warning': 'border-yellow-500 bg-yellow-50',
+    'success': 'border-green-500 bg-green-50',
+    'info': 'border-blue-500 bg-blue-50',
+    'prediction': 'border-purple-500 bg-purple-50',
+  };
+
+  return (
+    <Card className={cn(
+      'p-4 border-l-4 transition-all duration-300',
+      colorMap[insight.type],
+      insight.isRead ? 'opacity-70 hover:opacity-100' : 'animate-in fade-in-0 duration-500'
+    )}>
+      <div className="flex items-start gap-3">
+        <div className="flex-shrink-0 mt-0.5">
+          {iconMap[insight.type]}
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center justify-between">
+            <h4 className="font-semibold text-gray-900">{insight.title}</h4>
+            <Badge variant="secondary" size="sm">{formatRelativeTime(insight.timestamp)}</Badge>
+          </div>
+          <p className="text-sm text-gray-700 mt-1">{insight.message}</p>
+          <div className="flex items-center justify-between mt-3">
+            <Badge variant="info" size="sm">Confidence: {insight.confidence}%</Badge>
+            <div className="flex items-center gap-2">
+              {!insight.isRead && (
+                <Button size="sm" variant="secondary" onClick={onRead}>
+                  Mark as Read
+                </Button>
+              )}
+              {insight.action && (
+                <Button size="sm" variant={insight.action.type} onClick={onAction}>
+                  {insight.action.label}
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+const AIMessageBubble: React.FC<{
+  message: AIMessage;
+  onSuggestionClick: (suggestion: string) => void;
+}> = ({ message, onSuggestionClick }) => {
+  const isUser = message.type === 'user';
+  const isAI = message.type === 'ai';
+
+  return (
+    <div className={cn(
+      'flex gap-3',
+      isUser ? 'justify-end' : 'justify-start'
+    )}>
+      {isAI && (
+        <Avatar className="h-8 w-8 rounded-full flex-shrink-0 bg-blue-100">
+          <Bot className="h-5 w-5 text-blue-600" />
+        </Avatar>
+      )}
+      <div className={cn(
+        'max-w-md px-4 py-3 rounded-2xl',
+        isUser ? 'bg-blue-600 text-white rounded-br-none' : 'bg-gray-100 text-gray-800 rounded-bl-none'
+      )}>
+        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+        
+        {message.actions && message.actions.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {message.actions.map(action => (
+              <Button key={action.id} size="sm" variant={action.style}>
+                {action.label}
+              </Button>
+            ))}
+          </div>
+        )}
+
+        {message.suggestions && message.suggestions.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {message.suggestions.map(suggestion => (
+              <button
+                key={suggestion}
+                onClick={() => onSuggestionClick(suggestion)}
+                className="text-xs px-3 py-1.5 rounded-full border border-gray-300 hover:bg-gray-200 transition-colors"
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      {isUser && (
+        <Avatar className="h-8 w-8 rounded-full flex-shrink-0 bg-gray-200">
+          <User className="h-5 w-5 text-gray-600" />
+        </Avatar>
+      )}
+    </div>
+  );
+};
+
+const AIAnalyticsPanel: React.FC<{ userRole: 'agent' | 'operator' }> = ({ userRole }) => {
+  const analyticsData: AIAnalytics = {
+    totalInteractions: userRole === 'agent' ? 124 : 356,
+    avgResponseTime: userRole === 'agent' ? 1.2 : 0.8,
+    topQueries: [
+      { query: 'Optimize itinerary', count: 45, category: 'itinerary' },
+      { query: 'Find best flight deal', count: 32, category: 'search' },
+      { query: 'Client follow-up template', count: 28, category: 'communication' },
+      { query: 'Revenue report', count: 21, category: 'analytics' }
+    ],
+    satisfactionScore: userRole === 'agent' ? 92 : 88,
+    automationSaved: {
+      hours: userRole === 'agent' ? 8 : 24,
+      tasks: userRole === 'agent' ? 35 : 120,
+      value: userRole === 'agent' ? 450 : 1500
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Card className="p-4 flex items-center gap-4">
+          <div className="bg-blue-100 p-3 rounded-lg"><Activity className="h-6 w-6 text-blue-600" /></div>
+          <div>
+            <h4 className="text-sm text-gray-600">Total Interactions</h4>
+            <p className="text-2xl font-bold text-gray-900">{analyticsData.totalInteractions}</p>
+          </div>
+        </Card>
+        <Card className="p-4 flex items-center gap-4">
+          <div className="bg-green-100 p-3 rounded-lg"><Clock className="h-6 w-6 text-green-600" /></div>
+          <div>
+            <h4 className="text-sm text-gray-600">Avg. Response Time</h4>
+            <p className="text-2xl font-bold text-gray-900">{analyticsData.avgResponseTime}s</p>
+          </div>
+        </Card>
+      </div>
+
+      <Card className="p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-semibold text-gray-900">Top Queries</h3>
+          <ArrowRight className="h-4 w-4 text-gray-500" />
+        </div>
+        <div className="space-y-3">
+          {analyticsData.topQueries.map((query, index) => (
+            <div key={index} className="flex items-center justify-between">
+              <span className="text-sm text-gray-700">{query.query}</span>
+              <Badge variant="secondary">{query.count}</Badge>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-semibold text-gray-900">Automation & Efficiency</h3>
+          <Badge variant="info">
+            {formatCurrency(analyticsData.automationSaved.value)}
+          </Badge>
+        </div>
+        <p className="text-sm text-gray-600 mb-2">Automated tasks saved you time and money.</p>
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm text-gray-700">
+            <span>Hours Saved</span>
+            <span>{analyticsData.automationSaved.hours}h</span>
+          </div>
+          <Progress value={analyticsData.automationSaved.hours * 100 / 10} />
+          <div className="flex justify-between text-sm text-gray-700">
+            <span>Tasks Automated</span>
+            <span>{analyticsData.automationSaved.tasks}</span>
+          </div>
+          <Progress value={analyticsData.automationSaved.tasks * 100 / 150} />
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+const AISettingsPanel: React.FC<{
+  personalities: AIPersonality[];
+  activePersonality: AIPersonality;
+  onPersonalityChange: (personality: AIPersonality) => void;
+}> = ({ personalities, activePersonality, onPersonalityChange }) => {
+  const [isVoiceEnabled, setIsVoiceEnabled] = useState(true);
+  const [isAutoSuggestEnabled, setIsAutoSuggestEnabled] = useState(true);
+  const [isProactiveInsightsEnabled, setIsProactiveInsightsEnabled] = useState(true);
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900">AI Personality</h3>
+        <p className="text-sm text-gray-600">Choose the AI assistant that best fits your workflow.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+          {personalities.map((p) => (
+            <Card
+              key={p.id}
+              className={cn(
+                'p-4 cursor-pointer transition-all border-2',
+                activePersonality.id === p.id ? 'border-blue-600 shadow-md' : 'border-gray-200'
+              )}
+              onClick={() => onPersonalityChange(p)}
+            >
+              <div className="flex items-center gap-3">
+                <div className="text-2xl">{p.avatar}</div>
+                <div>
+                  <h4 className="font-semibold text-gray-900">{p.name}</h4>
+                  <p className="text-xs text-gray-500">{p.description}</p>
+                </div>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1">
+                {p.expertise.map((exp) => (
+                  <Badge key={exp} variant="secondary" size="sm" className="capitalize">{exp.replace('-', ' ')}</Badge>
+                ))}
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+      
+      <Separator />
+
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900">General Settings</h3>
+        <div className="space-y-4 mt-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium text-gray-900">Voice Integration</p>
+              <p className="text-sm text-gray-600">Enable voice commands and responses.</p>
+            </div>
+            <Switch checked={isVoiceEnabled} onCheckedChange={setIsVoiceEnabled} />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium text-gray-900">Auto-Suggestions</p>
+              <p className="text-sm text-gray-600">Display quick response suggestions in chat.</p>
+            </div>
+            <Switch checked={isAutoSuggestEnabled} onCheckedChange={setIsAutoSuggestEnabled} />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium text-gray-900">Proactive Insights</p>
+              <p className="text-sm text-gray-600">Receive automated, real-time alerts and opportunities.</p>
+            </div>
+            <Switch checked={isProactiveInsightsEnabled} onCheckedChange={setIsProactiveInsightsEnabled} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 // Advanced AI Copilot Component
 export const AdvancedAICopilot: React.FC<{
   userRole: 'agent' | 'operator';
@@ -258,7 +530,6 @@ export const AdvancedAICopilot: React.FC<{
   };
 
   const generateInitialInsights = () => {
-    // Generate contextual insights based on user role and current context
     const newInsights: AIInsight[] = [
       {
         id: `insight-${Date.now()}-1`,
@@ -334,7 +605,6 @@ export const AdvancedAICopilot: React.FC<{
     setInputMessage('');
     setIsProcessing(true);
 
-    // Simulate AI processing
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     const aiResponse = await generateAIResponse(inputMessage);
@@ -354,7 +624,6 @@ export const AdvancedAICopilot: React.FC<{
     let suggestions: string[] = [];
     let actions: AIAction[] = [];
 
-    // Context-aware AI responses
     if (lower.includes('lead') || lower.includes('client')) {
       content = `I can help you optimize your lead management. Based on your current pipeline, I recommend focusing on the Johnson Family lead ($12,000 value) and the startup group inquiry ($16,000 value). Both show high conversion probability.
 
@@ -392,14 +661,14 @@ Would you like me to draft communication templates for any of these?`;
       content = `Your revenue performance looks strong! Here's the breakdown:
 
 📊 **This Month:**
-- Current Pipeline: $89,500
-- Projected Commissions: $15,000
+- Current Pipeline: ${formatCurrency(userRole === 'agent' ? 89500 : 560000)}
+- Projected Commissions: ${formatCurrency(userRole === 'agent' ? 15000 : 85000)}
 - Conversion Rate: 68% (above average!)
 
 🎯 **Quick Wins:**
-- Convert your top 3 hot leads = +$6,500
-- Upsell existing bookings = +$2,000
-- Referral program activation = +$1,500
+- Convert your top 3 hot leads = +${formatCurrency(6500)}
+- Upsell existing bookings = +${formatCurrency(2000)}
+- Referral program activation = +${formatCurrency(1500)}
 
 Your conversion rate is 23% higher than the industry average. Keep up the excellent work!`;
 
@@ -441,7 +710,6 @@ What specific area would you like to dive into?`;
         'Optimize my workflow'
       ];
     } else {
-      // Fallback response
       content = `I understand you're asking about "${input}". Let me provide some relevant insights and suggestions based on your current context.`;
       
       suggestions = [
@@ -475,12 +743,10 @@ What specific area would you like to dive into?`;
 
   const toggleListening = () => {
     setIsListening(!isListening);
-    // Voice recognition would be implemented here
   };
 
   const toggleSpeaking = () => {
     setIsSpeaking(!isSpeaking);
-    // Text-to-speech would be implemented here
   };
 
   const markInsightAsRead = (insightId: string) => {
@@ -489,7 +755,6 @@ What specific area would you like to dive into?`;
     ));
   };
 
-  // Minimized state
   if (isMinimized) {
     const unreadInsights = insights.filter(i => !i.isRead).length;
     
@@ -510,7 +775,6 @@ What specific area would you like to dive into?`;
     );
   }
 
-  // Expanded state
   const copilotSize = isExpanded 
     ? 'w-[800px] h-[700px]' 
     : 'w-96 h-[600px]';
@@ -648,7 +912,12 @@ What specific area would you like to dive into?`;
                       placeholder={`Ask ${activePersonality.name} anything...`}
                       value={inputMessage}
                       onChange={(e) => setInputMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          sendMessage();
+                        }
+                      }}
                       className="pr-20"
                     />
                     <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
@@ -680,9 +949,8 @@ What specific area would you like to dive into?`;
                     size="sm"
                     onClick={sendMessage}
                     disabled={!inputMessage.trim() || isProcessing}
-                    icon={<Send className="h-4 w-4" />}
                   >
-                    Send
+                    <Send className="h-4 w-4" />
                   </Button>
                 </div>
               </div>

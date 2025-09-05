@@ -52,9 +52,10 @@ export function formatDate(
 }
 
 // Format relative time (e.g., "2 hours ago")
-export function formatRelativeTime(date: Date): string {
+export function formatRelativeTime(date: Date | string): string {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
   const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000);
   
   const intervals = [
     { label: 'year', seconds: 31536000 },
@@ -116,7 +117,7 @@ export function calculatePercentage(value: number, total: number): number {
 // Generate random ID
 export function generateId(prefix: string = ''): string {
   const timestamp = Date.now().toString(36);
-  const randomStr = Math.random().toString(36).substr(2, 5);
+  const randomStr = Math.random().toString(36).substring(2, 7);
   return prefix ? `${prefix}-${timestamp}-${randomStr}` : `${timestamp}-${randomStr}`;
 }
 

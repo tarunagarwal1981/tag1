@@ -1,7 +1,7 @@
-/* app/globals.css - Complete Design System */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* app/globals.css - Complete Design System - Fixed Version */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 /* Design Tokens */
 :root {
@@ -89,7 +89,7 @@
 /* Base Layer Customizations */
 @layer base {
   * {
-    @apply border-border;
+    @apply border-gray-200;
   }
   
   body {
@@ -123,13 +123,13 @@
 @layer components {
   /* Modern Card System */
   .modern-card {
-    @apply bg-white rounded-2xl border border-gray-200/80 shadow-sm;
+    @apply bg-white rounded-2xl border border-gray-200 shadow-sm;
     backdrop-filter: blur(10px);
     transition: all var(--transition-fast);
   }
 
   .modern-card.interactive-hover:hover {
-    @apply shadow-md border-gray-300/80 -translate-y-0.5;
+    @apply shadow-md border-gray-300 -translate-y-0.5;
   }
 
   .modern-card.glass {
@@ -187,6 +187,11 @@
     animation: slideUp 0.3s ease-out;
   }
 
+  /* Slide in from right animation */
+  .slide-in-from-right {
+    animation: slideInFromRight 0.3s ease-out;
+  }
+
   /* Status Badges */
   .status-active {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-100 text-success-800;
@@ -215,6 +220,19 @@
 
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Touch optimizations */
+  .touch-pan-y {
+    touch-action: pan-y;
+  }
+
+  .touch-pan-x {
+    touch-action: pan-x;
+  }
+
+  .touch-none {
+    touch-action: none;
   }
 }
 
@@ -247,6 +265,17 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 

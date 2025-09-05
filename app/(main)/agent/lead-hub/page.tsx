@@ -2,13 +2,13 @@
 
 'use client';
 
-import { CompleteLeadManager } from '@/components/dashboard/agent/CompleteLeadManager';
+import { EnhancedLeadManager } from '@/components/dashboard/agent/EnhancedLeadManager';
 import { EnhancedAICopilot } from '@/components/dashboard/agent/EnhancedAICopilot';
 
 export default function LeadHubPage() {
   return (
     <div className="relative">
-      <CompleteLeadManager />
+      <EnhancedLeadManager userRole="agent" />
       <EnhancedAICopilot />
     </div>
   );
